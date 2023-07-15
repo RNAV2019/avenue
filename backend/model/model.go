@@ -11,8 +11,8 @@ var db *gorm.DB
 
 type User struct {
 	gorm.Model
-	FBToken string `json:"fb_token" gorm:"not null"`
-	Avenue  Avenue `json:"avenue" gorm:"foreignKey:UserID"`
+	FirebaseID string `gorm:"unique;not null"`
+	Avenue     Avenue `json:"avenue" gorm:"foreignKey:UserID"`
 }
 
 type Avenue struct {

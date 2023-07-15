@@ -1,5 +1,8 @@
 <script lang="ts">
-	import { initializeApp, type FirebaseOptions } from 'firebase/app';
+	import type { Avenue } from '$lib/types';
+	import { userToken } from '$lib/store';
+	import { initializeApp } from 'firebase/app';
+	import { firebaseConfig } from '../config/firebase/firebase-config';
 	import {
 		GoogleAuthProvider,
 		browserSessionPersistence,
@@ -7,25 +10,13 @@
 		onAuthStateChanged,
 		setPersistence,
 		signInWithPopup,
-		type UserCredential,
+		signOut,
 		type User
 	} from 'firebase/auth';
-	import { onMount } from 'svelte';
+	import { goto } from '$app/navigation';
 
-	// TODO: Replace the following with your app's Firebase project configuration
-	// See: https://firebase.google.com/docs/web/learn-more#config-object
-	const firebaseConfig: FirebaseOptions = {
-		apiKey: 'AIzaSyDRgd0yNpM_ziPJmkex9Y-w0jRGs8sp8kw',
-		authDomain: 'avenue-f8597.firebaseapp.com',
-		projectId: 'avenue-f8597',
-		storageBucket: 'avenue-f8597.appspot.com',
-		messagingSenderId: '992541868817',
-		appId: '1:992541868817:web:b28df303c2cb6ea198c2b0',
-		measurementId: 'G-LRK89ZFGY5'
-	};
-
-	let token: string = '';
-	let user: User;
+	let user: User | null;
+	let avenue: Avenue | null;
 
 	// Initialize Firebase
 	const app = initializeApp(firebaseConfig);
@@ -36,18 +27,13 @@
 	async function loginWithGoogle() {
 		setPersistence(auth, browserSessionPersistence);
 		const userCred = await signInWithPopup(auth, new GoogleAuthProvider());
-		token = await userCred.user.getIdToken();
+		userToken.set(await userCred.user.getIdToken());
 		var header = new Headers();
-		header.append('Content-Type', 'application/json');
-
-		var raw = JSON.stringify({
-			token: token
-		});
+		header.append('Authorization', `Bearer ${$userToken}`);
 
 		var requestOptions: RequestInit = {
 			method: 'POST',
 			headers: header,
-			body: raw,
 			redirect: 'follow'
 		};
 
@@ -55,31 +41,55 @@
 		console.log(await res.json());
 	}
 
-	onMount(() => {
-		const loginToken = localStorage.getItem('token');
-	});
+	async function logout() {
+		await signOut(auth);
+		user = null;
+		userToken.set(null);
+		avenue = null;
+		console.log('Signed the user out on button press event');
+	}
 
 	onAuthStateChanged(auth, async (userState) => {
 		if (userState) {
 			// User is signed in
-			console.log('user is signed in');
 			user = userState;
-			token = await user.getIdToken();
+			userToken.set(await userState.getIdToken());
 		} else {
 			// User is signed out
-			// ...
-			console.log('user is signed out');
 		}
 	});
 </script>
 
-<main class="space-y-20 p-20">
-	<h1>Create account with Google</h1>
-	<button
-		class="rounded-md text-bold text-white bg-black px-4 py-2"
-		on:click={() => loginWithGoogle()}>Continue with Google</button
-	>
+<main class="space-y-10 p-10">
+	<nav class="flex flex-row gap-3 justify-between items-center">
+		<div class="flex flex-row gap-1 text-lg">
+			<h1>Avenue</h1>
+			{#if user}
+				<span>- logged in as {user.displayName}</span>
+			{/if}
+		</div>
+		<div class="flex flex-row gap-4 items-center">
+			{#if user}
+				<button
+					class="rounded-md font-bold text-sm text-white bg-black px-4 py-2"
+					on:click={() => logout()}>Sign Out</button
+				>
+				<img src={user.photoURL} alt="Profile" class="rounded-full w-9 h-9" />
+			{:else}
+				<button
+					class="rounded-md text-bold text-white bg-black px-4 py-2"
+					on:click={() => loginWithGoogle()}>Continue with Google</button
+				>
+			{/if}
+		</div>
+	</nav>
 	{#if user}
-		Logged In with JWT Token: {token}
+		<button
+			class="rounded-md text-bold text-white bg-black px-4 py-2"
+			on:click={() => {
+				goto(`/avenues/${user?.uid}`);
+			}}>Visit my avenue</button
+		>
 	{/if}
+	{$userToken}
 </main>
