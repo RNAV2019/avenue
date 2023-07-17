@@ -1,20 +1,12 @@
 package model
 
 func CreateUser(user User) (*User, error) {
-	newUser := User{
-		FirebaseID: user.FirebaseID,
-		Avenue: Avenue{
-			Title:       "Avenue Title",
-			Description: "Avenue Description",
-		},
-	}
-
-	err := db.Create(&newUser).Error
+	err := db.Create(&user).Error
 	if err != nil {
 		return nil, err
 	}
 
-	return &newUser, nil
+	return &user, nil
 }
 
 func GetUserByUID(uid string) (*User, error) {

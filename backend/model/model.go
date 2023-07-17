@@ -17,7 +17,6 @@ type User struct {
 
 type Avenue struct {
 	gorm.Model
-	Title       string `json:"title" gorm:"not null"`
 	Description string `json:"description" gorm:"not null"`
 	UserID      uint   `json:"user_id"`
 	Links       []Link `json:"links" gorm:"foreignKey:AvenueID"`

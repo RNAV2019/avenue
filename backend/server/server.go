@@ -53,7 +53,6 @@ func createUser(c *fiber.Ctx) error {
 	user := model.User{
 		FirebaseID: token.UID,
 		Avenue: model.Avenue{
-			Title:       "New Avenue",
 			Description: "New Description",
 		},
 	}
@@ -90,13 +89,44 @@ func getCurrentAvenue(c *fiber.Ctx) error {
 }
 
 func getUserByUID(c *fiber.Ctx) error {
-	id := c.Params("id")
+	uid := c.Params("uid")
 
-	user, err := model.GetUserByUID(id)
+	user, err := model.GetUserByUID(uid)
 	if err != nil {
 		return c.Status(fiber.StatusBadRequest).JSON(err)
 	}
 	return c.Status(fiber.StatusOK).JSON(user)
+}
+
+func getPictureAndName(c *fiber.Ctx) error {
+	uid := c.Params("uid")
+	profile, err := client.GetUser(context.Background(), uid)
+	if err != nil {
+		return c.Status(fiber.StatusBadRequest).JSON(err)
+	}
+	return c.Status(fiber.StatusOK).JSON(fiber.Map{"profile_picture": profile.PhotoURL, "name": profile.DisplayName})
+}
+
+func createLink(c *fiber.Ctx) error {
+	token, err := GetTokenFromJWT(c)
+	if err != nil {
+		return c.Status(fiber.StatusBadRequest).JSON(err)
+	}
+	user, err := GetUserFromUID(token)
+	if err != nil {
+		return c.Status(fiber.StatusBadRequest).JSON(err)
+	}
+	var link model.Link
+	err = c.BodyParser(&link)
+	if err != nil {
+		return c.Status(fiber.StatusBadRequest).JSON(err)
+	}
+	link.AvenueID = user.Avenue.ID
+	newLink, err := model.CreateLink(link)
+	if err != nil {
+		return c.Status(fiber.StatusBadRequest).JSON(err)
+	}
+	return c.Status(fiber.StatusOK).JSON(newLink)
 }
 
 func SetupFirebase() error {
@@ -123,11 +153,16 @@ func SetupAndListen() {
 
 	userRoute := router.Group("/user")
 	userRoute.Post("/create", createUser)
+	userRoute.Get("/info/:uid", getPictureAndName)
 	userRoute.Get("/list", getAllUsers)
 
 	avenueRoute := router.Group("/avenue")
 	avenueRoute.Get("/current", getCurrentAvenue)
-	avenueRoute.Get("/find/:id", getUserByUID)
+	avenueRoute.Get("/find/:uid", getUserByUID)
+
+	linksRoute := router.Group("/links")
+	linksRoute.Post("/create", createLink)
+	// linksRoute.Get("/find/:uid", getLinksByUID)
 
 	router.Listen(":3000")
 }
