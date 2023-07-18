@@ -45,13 +45,12 @@ func GetUserFromUID(token *auth.Token) (model.User, error) {
 }
 
 func createUser(c *fiber.Ctx) error {
-	token, err := GetTokenFromJWT(c)
-	if err == nil {
-		return c.Status(fiber.StatusOK).JSON(fiber.Map{"message": "User already exists so no new user created"})
-	}
+	// token, err := GetTokenFromJWT(c)
+	// if err == nil {
+	// 	return c.Status(fiber.StatusOK).JSON(fiber.Map{"message": "User already exists so no new user created"})
+	// }
 
 	user := model.User{
-		FirebaseID: token.UID,
 		Avenue: model.Avenue{
 			Description: "New Description",
 		},

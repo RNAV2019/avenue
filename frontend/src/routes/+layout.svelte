@@ -1,22 +1,24 @@
+<!-- src/routes/+layout.svelte -->
 <script lang="ts">
-	import { authStore } from '$lib/stores';
-	import { initializeApp } from 'firebase/app';
-	import { getAuth, onAuthStateChanged } from 'firebase/auth';
+	import { invalidate } from '$app/navigation';
 	import { onMount } from 'svelte';
 	import '../app.css';
-	import { firebaseConfig } from '../config/firebase/firebase-config';
-	// Initialize Firebase
-	const app = initializeApp(firebaseConfig);
 
-	// Initialize Firebase Authentication and get a reference to the service
-	const auth = getAuth(app);
+	export let data;
 
-	onMount(async () => {
-		onAuthStateChanged(auth, async (userState) => {
-			authStore.update((curr) => {
-				return { ...curr, isLoading: true, currentUser: userState };
-			});
+	let { supabase, session } = data;
+	$: ({ supabase, session } = data);
+
+	onMount(() => {
+		const {
+			data: { subscription }
+		} = supabase.auth.onAuthStateChange((event, _session) => {
+			if (_session?.expires_at !== session?.expires_at) {
+				invalidate('supabase:auth');
+			}
 		});
+
+		return () => subscription.unsubscribe();
 	});
 </script>
 

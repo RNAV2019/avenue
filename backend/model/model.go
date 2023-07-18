@@ -3,6 +3,7 @@ package model
 import (
 	"fmt"
 
+	"github.com/google/uuid"
 	"gorm.io/driver/postgres"
 	"gorm.io/gorm"
 )
@@ -11,8 +12,10 @@ var db *gorm.DB
 
 type User struct {
 	gorm.Model
-	FirebaseID string `gorm:"unique;not null"`
-	Avenue     Avenue `json:"avenue" gorm:"foreignKey:UserID"`
+	ID           uuid.UUID `gorm:"type:uuid;default:uuid_generate_v4()"`
+	Email        string    `gorm:"uniqueIndex"`
+	PasswordHash string
+	Avenue       Avenue `json:"avenue" gorm:"foreignKey:UserID"`
 }
 
 type Avenue struct {
@@ -30,7 +33,7 @@ type Link struct {
 }
 
 func Setup() {
-	dsn := "postgres://admin:test@localhost:5432/admin?sslmode=disable"
+	dsn := "postgresql://postgres:postgres@localhost:54322/postgres"
 	// dsn := "postgres://admin:test@" + os.Getenv("DB_HOST") + ":5432/admin?sslmode=disable"
 	var err error
 	db, err = gorm.Open(postgres.Open(dsn), &gorm.Config{})

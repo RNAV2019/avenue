@@ -1,39 +1,42 @@
 <script lang="ts">
 	import { goto } from '$app/navigation';
-	import { auth } from '$lib/firebase';
-	import type { Avenue } from '$lib/helper';
-	import { authStore } from '$lib/stores';
-	import {
-		GoogleAuthProvider,
-		browserSessionPersistence,
-		setPersistence,
-		signInWithPopup,
-		signOut
-	} from 'firebase/auth';
-
-	let avenue: Avenue | null;
+	import type { User } from '@supabase/supabase-js';
+	export let data;
+	let { supabase, session } = data;
+	$: ({ supabase } = data);
+	let user: User | null = session?.user!;
 
 	async function loginWithGoogle() {
-		setPersistence(auth, browserSessionPersistence);
-		const userCred = await signInWithPopup(auth, new GoogleAuthProvider());
-		var header = new Headers();
-		header.append('Authorization', `Bearer ${await userCred.user.getIdToken()}`);
+		let { data } = await supabase.auth.signInWithOAuth({
+			provider: 'google'
+		});
+		console.log('Logged in successfully with google');
+		console.log(`Logged in with ${data.provider} at url ${data.url}`);
 
-		var requestOptions: RequestInit = {
-			method: 'POST',
-			headers: header,
-			redirect: 'follow'
-		};
+		// var header = new Headers();
+		// header.append('Authorization', `Bearer ${await userCred.user.getIdToken()}`);
 
-		const res = await fetch('http://localhost:3000/user/create', requestOptions);
-		console.log(await res.json());
+		// var requestOptions: RequestInit = {
+		// 	method: 'POST',
+		// 	headers: header,
+		// 	redirect: 'follow'
+		// };
+
+		// const res = await fetch('http://localhost:3000/user/create', requestOptions);
+		// console.log(await res.json());
+	}
+
+	async function getDetails() {
+		user = (await supabase.auth.getUser()).data.user;
+		console.log(user?.email);
+		console.log(user?.user_metadata.avatar_url);
 	}
 
 	async function logout() {
-		await signOut(auth);
+		await supabase.auth.signOut();
+		user = (await supabase.auth.getUser()).data.user;
 		// user.set(null);
 		// userToken.set(undefined);
-		avenue = null;
 		console.log('Signed the user out on button press event');
 	}
 </script>
@@ -42,17 +45,17 @@
 	<nav class="flex flex-row gap-3 justify-between items-center">
 		<div class="flex flex-row gap-1 text-2xl font-medium items-center">
 			<h1>Avenue</h1>
-			{#if $authStore.currentUser}
-				<span>- logged in as {$authStore.currentUser.displayName}</span>
+			{#if user}
+				<span>- logged in as {user.email}</span>
 			{/if}
 		</div>
 		<div class="flex flex-row gap-4 items-center">
-			{#if $authStore.currentUser}
+			{#if user}
 				<button
 					class="rounded-md font-bold text-sm text-white bg-black px-4 py-2"
 					on:click={() => logout()}>Sign Out</button
 				>
-				<img src={$authStore.currentUser.photoURL} alt="Profile" class="rounded-full w-9 h-9" />
+				<img src={user?.user_metadata.avatar_url} alt="Profile" class="rounded-full w-9 h-9" />
 			{:else}
 				<button
 					class="rounded-md font-bold text-sm text-white bg-black px-4 py-2"
@@ -61,13 +64,13 @@
 			{/if}
 		</div>
 	</nav>
-	{#if $authStore.currentUser}
+	{#if user}
 		<button
 			class="rounded-md font-bold text-sm text-white bg-black px-4 py-2"
 			on:click={() => {
-				goto(`/avenues/${$authStore.currentUser?.uid}`);
+				goto(`/avenues/${user?.id}`);
 			}}>Visit my avenue</button
 		>
 	{/if}
-	{$authStore.currentUser}
+	{user}
 </main>
