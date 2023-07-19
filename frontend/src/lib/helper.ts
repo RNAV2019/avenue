@@ -1,19 +1,12 @@
-export type User = {
-	ID?: number;
-	CreatedAt?: Date;
-	UpdatedAt?: Date;
-	DeletedAt?: Date | null;
-	FirebaseID?: string;
-	avenue?: Avenue;
-};
-
 export type Avenue = {
 	ID?: number;
 	CreatedAt?: Date;
 	UpdatedAt?: Date;
-	DeletedAt?: Date | null;
+	DeletedAt?: null;
 	description?: string;
-	user_id?: number;
+	profile_image?: string;
+	name?: string;
+	user_id?: string;
 	links?: Link[];
 };
 
@@ -55,4 +48,64 @@ export const colorVariants = {
 	fuchsia: 'bg-fuchsia-500',
 	pink: 'bg-pink-500',
 	rose: 'bg-rose-500'
+};
+
+export type color =
+	| 'slate'
+	| 'gray'
+	| 'zinc'
+	| 'neutral'
+	| 'stone'
+	| 'red'
+	| 'orange'
+	| 'amber'
+	| 'yellow'
+	| 'lime'
+	| 'green'
+	| 'emerald'
+	| 'teal'
+	| 'cyan'
+	| 'sky'
+	| 'blue'
+	| 'indigo'
+	| 'violet'
+	| 'purple'
+	| 'fuchsia'
+	| 'pink'
+	| 'rose';
+
+export const color = [
+	'slate',
+	'gray',
+	'zinc',
+	'neutral',
+	'stone',
+	'red',
+	'orange',
+	'amber',
+	'yellow',
+	'lime',
+	'green',
+	'emerald',
+	'teal',
+	'cyan',
+	'sky',
+	'blue',
+	'indigo',
+	'violet',
+	'purple',
+	'fuchsia',
+	'pink',
+	'rose'
+];
+
+export type Statistic = {
+	GeographicLocation: string;
+	TrafficSource: string;
+	ClickTimestamp: Date;
+	AvenueID: number;
+};
+
+export type ClickCounts = {
+	[clickDate: string]: number;
 };

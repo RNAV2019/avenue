@@ -1,26 +1,36 @@
-import type { Avenue, User as DBUSER, UserInfo } from '$lib/helper';
+import type { Avenue, UserInfo } from '$lib/helper';
+import Cookie from 'js-cookie';
 import type { PageLoad } from './$types';
 
-export const load: PageLoad = async ({ params, fetch }) => {
+export const load: PageLoad = async ({ params, fetch, data }) => {
+	const headers = new Headers();
+	const location = Cookie.get('location') || null;
+	if (location) {
+		headers.append('X-Geo-Location', location);
+	}
 	const requestOptions: RequestInit = {
 		method: 'GET'
 	};
-	let avenue: Avenue | undefined;
-	let userInfo: UserInfo | undefined;
-	let dbuser: DBUSER | undefined;
+	const geoRequestOptions: RequestInit = {
+		method: 'GET',
+		headers: headers
+	};
+	let avenue: Avenue;
+	let userInfo: UserInfo;
+	let isOwner = false;
+	const userId: string | null = data.session?.user?.id;
 
 	const res = await fetch(`http://localhost:3000/avenue/find/${params.slug}`, requestOptions);
 
 	if (res.ok) {
-		dbuser = (await res.json()) as DBUSER;
-		avenue = dbuser.avenue;
+		avenue = (await res.json()) as Avenue;
 	} else {
 		throw new Error('Avenue not found');
 	}
 
 	const profileRes = await fetch(
-		`http://localhost:3000/user/info/${dbuser.FirebaseID}`,
-		requestOptions
+		`http://localhost:3000/avenue/userinfo/${params.slug}`,
+		geoRequestOptions
 	);
 	if (profileRes.ok) {
 		userInfo = (await profileRes.json()) as UserInfo;
@@ -28,11 +38,18 @@ export const load: PageLoad = async ({ params, fetch }) => {
 		throw new Error('User not found');
 	}
 
+	if (params.slug == userId) {
+		isOwner = true;
+	} else {
+		isOwner = false;
+	}
+
 	console.log(params.slug);
 
 	return {
 		slug: params.slug,
 		avenue: avenue,
-		userInfo: userInfo
+		userInfo: userInfo,
+		isOwner: isOwner
 	};
 };

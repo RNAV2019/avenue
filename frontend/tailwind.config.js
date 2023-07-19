@@ -4,7 +4,8 @@ export default {
 	theme: {
 		extend: {
 			boxShadow: {
-				brutal: '3px 4px 0px 1px #000;'
+				brutal: '3px 4px 0px 1px #000;',
+				calm: '1.5px 2px 0px 1px #000;'
 			},
 			backgroundImage: {
 				grainy:

@@ -34,6 +34,11 @@
 	"dependencies": {
 		"@supabase/auth-helpers-sveltekit": "^0.10.1",
 		"@supabase/supabase-js": "^2.26.0",
-		"firebase": "^10.0.0"
+		"@types/js-cookie": "^3.0.3",
+		"chart.js": "^4.3.0",
+		"chartjs-adapter-moment": "^1.0.1",
+		"js-cookie": "^3.0.5",
+		"lucide-svelte": "^0.261.0",
+		"moment": "^2.29.4"
 	}
 }

@@ -1,6 +1,5 @@
 <script lang="ts">
 	import { colorVariants } from '$lib/helper';
-	import type { DispatchOptions } from 'svelte';
 
 	export let color:
 		| 'slate'
@@ -25,7 +24,6 @@
 		| 'fuchsia'
 		| 'pink'
 		| 'rose' = 'red';
-
 	let className: string;
 	export { className as class };
 </script>
@@ -40,6 +38,6 @@
 	/>
 
 	<span class={`relative block border-2 border-current ${colorVariants[color]} ${className}`}>
-		<div class="grainy w-full h-full flex items-center justify-center"><slot /></div>
+		<div class="flex items-center justify-center w-full h-full grainy"><slot /></div>
 	</span>
 </button>

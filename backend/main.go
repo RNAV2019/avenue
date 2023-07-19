@@ -7,9 +7,5 @@ import (
 
 func main() {
 	model.Setup()
-	err := server.SetupFirebase()
-	if err != nil {
-		panic(err)
-	}
 	server.SetupAndListen()
 }

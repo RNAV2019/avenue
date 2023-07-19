@@ -7,11 +7,13 @@
 	const dispatch = createEventDispatcher();
 	export let avenue: Avenue | undefined;
 	export let userToken: string | undefined;
+	export let link: Link | undefined;
 	const close = () => {
 		dispatch('close');
 	};
-	let linkName: string;
-	let urlString: string;
+	let linkName: string = link?.description!;
+	let urlString: string = link?.url!;
+
 	const urlRegex = /^(https?:\/\/)?([\w.-]+\.[a-zA-Z]{2,})(:\d+)?(\/[^\s]*)?$/;
 
 	function validation() {
@@ -30,7 +32,7 @@
 		return true;
 	}
 
-	const createLink = async () => {
+	const updateLink = async () => {
 		var header = new Headers();
 		header.append('Authorization', `Bearer ${userToken}`);
 		header.append('Content-Type', 'application/json');
@@ -41,38 +43,40 @@
 		if (valid == false) {
 			return;
 		}
-		let link: Link = {
-			url: urlString,
-			description: linkName
+		let updatedLink: Link = {
+			ID: link?.ID,
+			url: urlString!,
+			description: linkName,
+			avenue_id: avenue?.ID
 		};
-		console.log(link);
+		console.log(updatedLink);
 
 		var requestOptions: RequestInit = {
-			method: 'POST',
+			method: 'PATCH',
 			headers: header,
-			body: JSON.stringify(link),
+			body: JSON.stringify(updatedLink),
 			redirect: 'follow'
 		};
 
-		const res = await fetch(`http://localhost:3000/links/create`, requestOptions);
+		const res = await fetch(`http://localhost:3000/links/update`, requestOptions);
 
 		if (res.ok) {
-			console.log('Created the link succesfully');
+			console.log('Update the link succesfully');
 			close();
 		} else {
-			throw new Error('Unable to create link' + res.statusText);
+			throw new Error('Unable to update link' + res.statusText);
 		}
 	};
 </script>
 
 <div class="fixed top-0 left-0 z-50 w-full h-full bg-black bg-opacity-80" on:close={close}>
-	<div class="max-w-lg mx-auto rounded-lg my-52 bg-cyan-500 dark:bg-secondary shadow-brutal">
+	<div class="max-w-lg mx-auto bg-orange-500 rounded-lg my-52 dark:bg-secondary shadow-brutal">
 		<form
-			class="flex flex-col items-center w-full h-full gap-4 p-8 grainy"
-			name="createForm"
-			on:submit|preventDefault={createLink}
+			class="flex flex-col items-center w-full h-full p-8 grainy gap-4"
+			name="updateForm"
+			on:submit|preventDefault={updateLink}
 		>
-			<h3 class="mb-2 text-xl font-medium">Create Link</h3>
+			<h3 class="mb-2 text-xl font-medium">Update Link</h3>
 			<input
 				type="text"
 				id="name"
@@ -90,7 +94,7 @@
 				class="w-2/3 p-2 px-3 mb-2 text-sm border-2 border-black rounded-sm outline-none shadow-brutal placeholder:text-black"
 			/>
 			<div class="flex flex-row gap-8">
-				<SubmitButton class="w-32 h-10 text-xs" color={'emerald'}>Create</SubmitButton>
+				<SubmitButton class="w-32 h-10 text-xs" color={'fuchsia'}>Update</SubmitButton>
 				<Button class="w-32 h-10 text-xs" color={'red'} on:click={close}>Close</Button>
 			</div>
 		</form>
