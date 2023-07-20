@@ -1,25 +1,30 @@
-import moment from 'moment';
-import type { ClickCounts, Statistic } from './helper';
+import type { Statistic } from './helper';
 
 export function processDataForLineGraph(data: Statistic[]) {
-	// Assuming `data` is an array of statistics objects
-	const clickCounts: ClickCounts = {};
+	type ClickCounts = {
+		[date: string]: number;
+	};
 
-	data.forEach((statistic: Statistic) => {
-		// Group the data by click timestamp and count the number of clicks on each date
-		const clickDate = moment.utc(statistic.ClickTimestamp).toISOString();
-		console.log(statistic.ClickTimestamp);
+	// Group the data by click date and count the number of clicks on each date
+	const clickCounts: ClickCounts = {};
+	data.forEach((statistic) => {
+		// const clickDate = new Date(statistic.click_timestamp).toLocaleString(undefined, {
+		// 	month: 'numeric',
+		// 	day: 'numeric',
+		// 	year: 'numeric',
+		// 	hour: 'numeric',
+		// 	minute: 'numeric',
+		// 	hour12: false
+		// });
+		const clickDate = new Date(statistic.click_timestamp).toUTCString();
 		clickCounts[clickDate] = clickCounts[clickDate] + 1 || 1;
-		console.log(clickCounts);
 	});
 
-	// Extract the dates and click counts for the line graph
+	// Extract the unique dates
 	const dates = Object.keys(clickCounts);
-	const clickData = Object.values(clickCounts);
 
-	console.log(dates, clickData);
-	console.log(data);
+	// Create an array of click counts corresponding to the dates
+	const clickData = dates.map((date) => clickCounts[date]);
 
-	// Return the data for the line graph
 	return { dates, clickData };
 }

@@ -1,5 +1,5 @@
 import type { Avenue, Statistic } from '$lib/helper';
-import type { PageLoad } from './$types';
+import type { PageLoad } from './avenues/[slug]/$types';
 
 export const load: PageLoad = async ({ fetch, data }) => {
 	type StatisticJSON = {

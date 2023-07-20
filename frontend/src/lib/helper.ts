@@ -100,10 +100,14 @@ export const color = [
 ];
 
 export type Statistic = {
-	GeographicLocation: string;
-	TrafficSource: string;
-	ClickTimestamp: Date;
-	AvenueID: number;
+	ID?: number;
+	CreatedAt?: Date;
+	UpdatedAt?: Date;
+	DeletedAt?: null;
+	geographic_location?: string;
+	traffic_source?: string;
+	click_timestamp: Date;
+	avenue_id?: number;
 };
 
 export type ClickCounts = {
