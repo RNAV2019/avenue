@@ -1,8 +1,6 @@
 package model
 
 import (
-	"fmt"
-
 	"github.com/google/uuid"
 	supa "github.com/nedpals/supabase-go"
 )
@@ -26,11 +24,8 @@ func GetProfileImageAndName(uid string) (string, string, error) {
 }
 
 func CreateAvenue(uid string, user *supa.User) (*Avenue, error) {
-	fmt.Println(uuid.MustParse(uid))
 	profileURL := user.UserMetadata["avatar_url"].(string)
 	name := user.UserMetadata["name"].(string)
-	fmt.Println(profileURL)
-	fmt.Println(name)
 
 	var avenue Avenue = Avenue{
 		UserID:       uuid.MustParse(uid),
@@ -49,7 +44,6 @@ func CreateAvenue(uid string, user *supa.User) (*Avenue, error) {
 			return nil, err
 		}
 	} else {
-		fmt.Println("Avenue already exists")
 		return &avenues[0], nil
 	}
 

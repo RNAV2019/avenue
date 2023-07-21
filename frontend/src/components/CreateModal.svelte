@@ -3,6 +3,7 @@
 	import Button from './Button.svelte';
 	import SubmitButton from './SubmitButton.svelte';
 	import type { Avenue, Link } from '$lib/helper';
+	import { PUBLIC_API_ENDPOINT_URL } from '$env/static/public';
 
 	const dispatch = createEventDispatcher();
 	export let avenue: Avenue | undefined;
@@ -34,8 +35,6 @@
 		var header = new Headers();
 		header.append('Authorization', `Bearer ${userToken}`);
 		header.append('Content-Type', 'application/json');
-		console.log('User Token' + userToken);
-		console.log('AvenueID' + avenue?.ID);
 
 		const valid = validation();
 		if (valid == false) {
@@ -45,7 +44,6 @@
 			url: urlString,
 			description: linkName
 		};
-		console.log(link);
 
 		var requestOptions: RequestInit = {
 			method: 'POST',
@@ -54,10 +52,9 @@
 			redirect: 'follow'
 		};
 
-		const res = await fetch(`http://localhost:3000/links/create`, requestOptions);
+		const res = await fetch(`${PUBLIC_API_ENDPOINT_URL}/links/create`, requestOptions);
 
 		if (res.ok) {
-			console.log('Created the link succesfully');
 			close();
 		} else {
 			throw new Error('Unable to create link' + res.statusText);

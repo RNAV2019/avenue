@@ -1,38 +1,34 @@
+import { PUBLIC_API_ENDPOINT_URL } from '$env/static/public';
 import type { Avenue, Statistic } from '$lib/helper';
 import type { PageLoad } from './avenues/[slug]/$types';
 
 export const load: PageLoad = async ({ fetch, data }) => {
-	type StatisticJSON = {
+	type DashboardJSON = {
 		statistics: Statistic[];
 		clicks: number;
+		avenue: Avenue;
 	};
 
 	const requestOptions: RequestInit = {
 		method: 'GET'
 	};
-	let avenue: Avenue;
-	let aggregateClicks: number;
-	let statistics: Statistic[];
-	const userID = data.session.user.id;
-	const resFind = await fetch(`http://localhost:3000/avenue/find/${userID}`, requestOptions);
+	let avenue: Avenue | undefined = undefined;
+	let aggregateClicks: number | undefined = undefined;
+	let statistics: Statistic[] | undefined = undefined;
+	const userID: string | undefined = data.session?.user?.id;
 
-	if (resFind.ok) {
-		avenue = (await resFind.json()) as Avenue;
-	} else {
-		throw new Error('Avenue not found');
-	}
+	if (userID != undefined && userID != '') {
+		const dashboardRes = await fetch(
+			`${PUBLIC_API_ENDPOINT_URL}/dashboard/all/${userID}`,
+			requestOptions
+		);
 
-	const statisticsRes = await fetch(
-		`http://localhost:3000/dashboard/all/${avenue.ID}`,
-		requestOptions
-	);
-
-	if (statisticsRes.ok) {
-		const statisticJSON = (await statisticsRes.json()) as StatisticJSON;
-		statistics = statisticJSON.statistics;
-		aggregateClicks = statisticJSON.clicks;
-	} else {
-		throw new Error('Statistics not found');
+		if (dashboardRes.ok) {
+			const dashboardJSON = (await dashboardRes.json()) as DashboardJSON;
+			statistics = dashboardJSON.statistics;
+			aggregateClicks = dashboardJSON.clicks;
+			avenue = dashboardJSON.avenue;
+		}
 	}
 	return {
 		avenue,

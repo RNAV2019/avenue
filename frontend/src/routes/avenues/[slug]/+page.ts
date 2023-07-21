@@ -1,6 +1,7 @@
-import type { Avenue, UserInfo } from '$lib/helper';
+import type { UserInfo } from '$lib/helper';
 import Cookie from 'js-cookie';
 import type { PageLoad } from './$types';
+import { PUBLIC_API_ENDPOINT_URL } from '$env/static/public';
 
 export const load: PageLoad = async ({ params, fetch, data }) => {
 	const headers = new Headers();
@@ -8,28 +9,16 @@ export const load: PageLoad = async ({ params, fetch, data }) => {
 	if (location) {
 		headers.append('X-Geo-Location', location);
 	}
-	const requestOptions: RequestInit = {
-		method: 'GET'
-	};
 	const geoRequestOptions: RequestInit = {
 		method: 'GET',
 		headers: headers
 	};
-	let avenue: Avenue;
 	let userInfo: UserInfo;
 	let isOwner = false;
 	const userId: string | null = data.session?.user?.id;
 
-	const res = await fetch(`http://localhost:3000/avenue/find/${params.slug}`, requestOptions);
-
-	if (res.ok) {
-		avenue = (await res.json()) as Avenue;
-	} else {
-		throw new Error('Avenue not found');
-	}
-
 	const profileRes = await fetch(
-		`http://localhost:3000/avenue/userinfo/${params.slug}`,
+		`${PUBLIC_API_ENDPOINT_URL}/avenue/userinfo/${params.slug}`,
 		geoRequestOptions
 	);
 	if (profileRes.ok) {
@@ -44,11 +33,9 @@ export const load: PageLoad = async ({ params, fetch, data }) => {
 		isOwner = false;
 	}
 
-	console.log(params.slug);
-
 	return {
 		slug: params.slug,
-		avenue: avenue,
+		avenue: userInfo.avenue,
 		userInfo: userInfo,
 		isOwner: isOwner
 	};

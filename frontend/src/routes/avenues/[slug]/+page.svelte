@@ -6,12 +6,12 @@
 	import UpdateModal from '../../../components/UpdateModal.svelte';
 	import { onMount } from 'svelte';
 	import Cookie from 'js-cookie';
+	import { PUBLIC_API_ENDPOINT_URL } from '$env/static/public';
 
 	export let data;
 	const urlRegex = /^(https?:\/\/)/;
 	let avenue: Avenue | undefined = data.avenue;
 	let links: Link[] = data.avenue?.links!;
-	console.log(links);
 	let picture: string | undefined = data.userInfo.profile_picture;
 	let name: string | undefined = data.userInfo.name;
 	let userToken: string | undefined = data.session?.access_token;
@@ -31,7 +31,7 @@
 		const requestOptions: RequestInit = {
 			method: 'GET'
 		};
-		const res = await fetch(`http://localhost:3000/avenue/find/${data.slug}`, requestOptions);
+		const res = await fetch(`${PUBLIC_API_ENDPOINT_URL}/avenue/find/${data.slug}`, requestOptions);
 
 		if (res.ok) {
 			let avenue = (await res.json()) as Avenue;
@@ -61,7 +61,7 @@
 			headers: header,
 			redirect: 'follow'
 		};
-		const res = await fetch(`http://localhost:3000/links/delete/${id}`, requestOptions);
+		const res = await fetch(`${PUBLIC_API_ENDPOINT_URL}/links/delete/${id}`, requestOptions);
 		reloadLinks();
 	}
 </script>
@@ -92,8 +92,6 @@
 								on:click={() => {
 									updateModalIndex = link.ID;
 									showUpdateModal = true;
-									console.log(avenue);
-									console.log(updateModalIndex);
 								}}
 							>
 								<PenLine size={20} />

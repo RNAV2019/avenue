@@ -18,6 +18,8 @@
 	import moment from 'moment';
 	import { onMount } from 'svelte';
 	import Button from '../components/Button.svelte';
+	import { redirect } from '@sveltejs/kit';
+	import { PUBLIC_API_ENDPOINT_URL } from '$env/static/public';
 	export let data;
 	let { supabase, session, aggregateClicks, avenue, statistics } = data;
 	$: ({ supabase } = data);
@@ -119,7 +121,7 @@
 				headers: header,
 				redirect: 'follow'
 			};
-			const res = await fetch('http://localhost:3000/avenue/create', requestOptions);
+			const res = await fetch(`${PUBLIC_API_ENDPOINT_URL}/avenue/create`, requestOptions);
 		}
 
 		Chart.register(
@@ -130,7 +132,9 @@
 			LineElement,
 			Tooltip
 		);
-		createLineGraph(statistics);
+		if (statistics != undefined) {
+			createLineGraph(statistics);
+		}
 	});
 
 	async function logout() {
@@ -202,7 +206,7 @@
 					</span>
 
 					<div>
-						<p class="text-3xl font-bold text-gray-900">{avenue.links?.length}</p>
+						<p class="text-3xl font-bold text-gray-900">{avenue?.links?.length}</p>
 
 						<p class="text-sm font-medium">Number of links</p>
 					</div>

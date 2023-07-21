@@ -23,6 +23,7 @@ export type Link = {
 export type UserInfo = {
 	profile_picture?: string;
 	name?: string;
+	avenue?: Avenue;
 };
 
 export const colorVariants = {
