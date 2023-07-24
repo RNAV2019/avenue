@@ -1,6 +1,6 @@
 import { PUBLIC_API_ENDPOINT_URL } from '$env/static/public';
 import type { Avenue, Statistic } from '$lib/helper';
-import type { PageLoad } from './avenues/[slug]/$types';
+import type { PageLoad } from './$types';
 
 export const load: PageLoad = async ({ fetch, data }) => {
 	type DashboardJSON = {
@@ -8,7 +8,6 @@ export const load: PageLoad = async ({ fetch, data }) => {
 		clicks: number;
 		avenue: Avenue;
 	};
-
 	const requestOptions: RequestInit = {
 		method: 'GET'
 	};
@@ -16,13 +15,11 @@ export const load: PageLoad = async ({ fetch, data }) => {
 	let aggregateClicks: number | undefined = undefined;
 	let statistics: Statistic[] | undefined = undefined;
 	const userID: string | undefined = data.session?.user?.id;
-
 	if (userID != undefined && userID != '') {
 		const dashboardRes = await fetch(
 			`${PUBLIC_API_ENDPOINT_URL}/dashboard/all/${userID}`,
 			requestOptions
 		);
-
 		if (dashboardRes.ok) {
 			const dashboardJSON = (await dashboardRes.json()) as DashboardJSON;
 			statistics = dashboardJSON.statistics;

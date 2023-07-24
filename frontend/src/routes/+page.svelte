@@ -46,7 +46,6 @@
 		new Chart(ctx, {
 			type: 'line',
 			data: {
-				// yLabels: newDates,
 				labels: dates,
 				datasets: [
 					{

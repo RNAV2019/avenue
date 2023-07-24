@@ -38,9 +38,7 @@ type Link struct {
 }
 
 func Setup() {
-	// var dsn string = "postgresql://postgres:test@localhost:5432/postgres"
-	// dsn := "postgresql://postgres:test@" + os.Getenv("DB_HOST") + ":5432/postgres"
-	dsn := os.Getenv("DB_DSN")
+	dsn := "user=postgres password=" + os.Getenv("DB_PASS") + " host=" + os.Getenv("DB_HOST") + " port=5432 dbname=postgres"
 	fmt.Println(dsn)
 	var err error
 	db, err = gorm.Open(postgres.Open(dsn), &gorm.Config{})

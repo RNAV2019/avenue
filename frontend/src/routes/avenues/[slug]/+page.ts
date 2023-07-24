@@ -1,7 +1,7 @@
 import type { UserInfo } from '$lib/helper';
 import Cookie from 'js-cookie';
-import type { PageLoad } from './$types';
 import { PUBLIC_API_ENDPOINT_URL } from '$env/static/public';
+import type { PageLoad } from './$types';
 
 export const load: PageLoad = async ({ params, fetch, data }) => {
 	const headers = new Headers();
