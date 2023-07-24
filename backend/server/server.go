@@ -210,5 +210,5 @@ func SetupAndListen() {
 	dashboardRoute := router.Group("/dashboard")
 	dashboardRoute.Get("/all/:uid", getAllStatistics)
 
-	router.Listen(":3030")
+	router.Listen("0.0.0.0:3030")
 }
