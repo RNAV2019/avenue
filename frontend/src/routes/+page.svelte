@@ -28,7 +28,10 @@
 
 	async function loginWithGoogle() {
 		let { data } = await supabase.auth.signInWithOAuth({
-			provider: 'google'
+			provider: 'google',
+			options: {
+				redirectTo: 'https://avenue-alpha.vercel.app/auth/callback'
+			}
 		});
 	}
 
