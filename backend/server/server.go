@@ -124,7 +124,7 @@ func getPictureAndName(c *fiber.Ctx) error {
 	trafficSource := c.Get("Referer")
 	statisticModel := model.Statistic{
 		AvenueID:           avenue.ID,
-		ClickTimestamp:     time.Now(),
+		ClickTimestamp:     time.Now().Format("2006-01-02"),
 		GeographicLocation: geographicLocation,
 		TrafficSource:      trafficSource,
 	}

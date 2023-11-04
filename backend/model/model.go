@@ -3,7 +3,6 @@ package model
 import (
 	"fmt"
 	"os"
-	"time"
 
 	"github.com/google/uuid"
 	"gorm.io/driver/postgres"
@@ -24,10 +23,10 @@ type Avenue struct {
 
 type Statistic struct {
 	gorm.Model
-	GeographicLocation string    `json:"geographic_location"`
-	TrafficSource      string    `json:"traffic_source"`
-	ClickTimestamp     time.Time `json:"click_timestamp"`
-	AvenueID           uint      `json:"avenue_id"`
+	GeographicLocation string `json:"geographic_location"`
+	TrafficSource      string `json:"traffic_source"`
+	ClickTimestamp     string `json:"click_timestamp"`
+	AvenueID           uint   `json:"avenue_id"`
 }
 
 type Link struct {
