@@ -16,6 +16,10 @@ import (
 
 var supabase *supa.Client
 
+type Description struct {
+	Description string `json:"description"`
+}
+
 func getAvenueFromJWT(tokenString string) (model.Avenue, error) {
 	user, err := supabase.Auth.User(context.TODO(), tokenString)
 	if err != nil {
@@ -53,6 +57,47 @@ func createAvenue(c *fiber.Ctx) error {
 		return c.Status(fiber.StatusBadRequest).JSON(err)
 	}
 	return c.Status(fiber.StatusOK).JSON(avenue)
+}
+
+func updateAvenue(c *fiber.Ctx) error {
+	var tokenString string
+	reqHeaders := c.GetReqHeaders()
+	reqArray := strings.Split(reqHeaders["Authorization"], " ")
+
+	if len(reqArray) == 2 {
+		tokenString = reqArray[1]
+	} else {
+		return fmt.Errorf("no authorization headers found")
+	}
+
+	avenue, err := getAvenueFromJWT(tokenString)
+	if err != nil {
+		return c.Status(fiber.StatusBadRequest).JSON(
+			fiber.Map{
+				"Error":  "Error with getting the avenue",
+				"Avenue": avenue,
+				"err":    err,
+			},
+		)
+	}
+
+	var description Description
+	err = c.BodyParser(&description)
+	if err != nil {
+		return c.Status(fiber.StatusBadRequest).JSON(
+			fiber.Map{
+				"Error":  "Error with parsing the description",
+				"Avenue": avenue,
+				"err":    err,
+			},
+		)
+	}
+	avenue.Description = description.Description
+	newAvenue, err := model.UpdateAvenue(avenue)
+	if err != nil {
+		return c.Status(fiber.StatusBadRequest).JSON(err)
+	}
+	return c.Status(fiber.StatusOK).JSON(newAvenue)
 }
 
 func getAvenueByUID(c *fiber.Ctx) error {
@@ -199,6 +244,7 @@ func SetupAndListen() {
 
 	avenueRoute := router.Group("/avenue")
 	avenueRoute.Post("/create", createAvenue)
+	avenueRoute.Patch("/update", updateAvenue)
 	avenueRoute.Get("/find/:uid", getAvenueByUID)
 	avenueRoute.Get("/userinfo/:uid", getPictureAndName)
 

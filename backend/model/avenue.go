@@ -50,3 +50,11 @@ func CreateAvenue(uid string, user *supa.User) (*Avenue, error) {
 	return &avenue, nil
 
 }
+
+func UpdateAvenue(avenue Avenue) (*Avenue, error) {
+	err := db.Save(&avenue).Error
+	if err != nil {
+		return nil, err
+	}
+	return &avenue, nil
+}
