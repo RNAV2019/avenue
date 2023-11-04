@@ -20,6 +20,7 @@
 	import Button from '../components/Button.svelte';
 	import { redirect } from '@sveltejs/kit';
 	import { PUBLIC_API_ENDPOINT_URL } from '$env/static/public';
+	import UpdateDescriptionModal from '../components/UpdateDescriptionModal.svelte';
 	export let data;
 	let { supabase, session, aggregateClicks, avenue, statistics } = data;
 	$: ({ supabase } = data);
@@ -34,6 +35,10 @@
 			}
 		});
 	}
+	let showDescriptionModal = false;
+	const close = async () => {
+		showDescriptionModal = false;
+	};
 
 	// Function to create the line graph using Chart.js
 	function createLineGraph(data: Statistic[]) {
@@ -173,14 +178,24 @@
 		>
 			<div class="flex flex-row items-center justify-between">
 				<h1 class="ml-2 text-xl font-medium">Dashboard</h1>
-				<Button
-					class="h-12 w-44"
-					color="indigo"
-					on:click={() => {
-						goto(`/avenues/${user?.id}`);
-					}}
-					>Visit my avenue
-				</Button>
+				<div class="flex gap-3">
+					<Button
+						class="h-12 w-44"
+						color="teal"
+						on:click={() => {
+							showDescriptionModal = true;
+						}}
+						>Edit Description
+					</Button>
+					<Button
+						class="h-12 w-44"
+						color="indigo"
+						on:click={() => {
+							goto(`/avenues/${user?.id}`);
+						}}
+						>Visit my avenue
+					</Button>
+				</div>
 			</div>
 			<section class="flex flex-row justify-between gap-3">
 				<article
@@ -222,3 +237,7 @@
 		</div>
 	{/if}
 </main>
+
+{#if showDescriptionModal}
+	<UpdateDescriptionModal on:close={close} {avenue} userToken={token} />
+{/if}

@@ -19,6 +19,9 @@ export type Link = {
 	description?: string;
 	avenue_id?: number;
 };
+export type Description = {
+	description: string;
+};
 
 export type UserInfo = {
 	profile_picture?: string;
